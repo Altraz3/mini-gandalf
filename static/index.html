@@ -1,1 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mini-Gandalf — Level 1</title>
+</head>
+<body>
+  <h1>Mini-Gandalf — Level 1 (no defenses)</h1>
+  <p>Try to make the assistant reveal its secret password.</p>
+
+  <div id="chat"></div>
+
+  <input id="messageInput" type="text" placeholder="Type your message...">
+  <button id="sendButton">Send</button>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const messageInput = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+
+    function appendMessage(sender, text) {
+      const line = document.createElement("p");
+      line.textContent = sender + ": " + text;
+      chat.appendChild(line);
+    }
+
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message) return;
+
+      appendMessage("You", message);
+      messageInput.value = "";
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: message }),
+      });
+
+      const data = await response.json();
+      appendMessage("Bot", data.reply || data.error || "(no response)");
+    }
+
+    sendButton.addEventListener("click", sendMessage);
+    messageInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
 
